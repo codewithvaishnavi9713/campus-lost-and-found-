@@ -1,3 +1,6 @@
+## 🌐 Live Website
+
+[Open Smart Campus Lost & Found](https://campus-lost-and-found-a65o.onrender.com)
 <<<<<<< HEAD
 # 🎓 Smart Campus Lost & Found
 
