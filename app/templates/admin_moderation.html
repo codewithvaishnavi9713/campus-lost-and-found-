@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Campus Moderation | Smart Campus Lost & Found{% endblock %}
+{% block content %}
+<div class="container page-wrapper">
+  <div class="page-header"><div><h1 class="page-title">Campus Moderation</h1><p class="page-subtitle">Review the latest 100 reports and close items that have been safely returned.</p></div></div>
+  <div class="card"><div class="card-content">
+    {% for item in items %}
+      <div class="item-details-row"><span><strong>{{ item.title }}</strong> · {{ item.item_type }} · {{ item.status }} · {{ item.reporter.email }}</span>{% if item.status == 'active' %}<form method="POST" action="{{ url_for('admin.resolve', item_id=item.id) }}"><button class="btn btn-secondary btn-sm">Mark resolved</button></form>{% endif %}</div>
+    {% else %}<p>No reports available.</p>{% endfor %}
+  </div></div>
+</div>
+{% endblock %}

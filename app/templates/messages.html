@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Messages | Smart Campus Lost & Found{% endblock %}
+{% block content %}
+<div class="container page-wrapper">
+  <div class="page-header"><div><h1 class="page-title">&#128236; Messages</h1><p class="page-subtitle">Private messages about your campus item reports.</p></div></div>
+  {% if messages %}<section class="messages-list">
+    {% for message in messages %}
+      <a class="message-row {% if not message.is_read %}unread{% endif %}" href="{{ url_for('messages.message_detail', id=message.id) }}">
+        <div class="message-row-main"><strong>{{ message.sender.name }}</strong><span>{{ message.subject }}</span><p>{{ message.body | truncate(130) }}</p></div>
+        <div class="message-row-meta"><span class="status-badge {% if message.is_read %}resolved{% else %}active{% endif %}">{% if message.is_read %}READ{% else %}UNREAD{% endif %}</span><span>{{ message.item.title }}</span><time>{{ message.created_at.strftime('%b %d, %Y %H:%M') }}</time></div>
+      </a>
+    {% endfor %}
+  </section>{% else %}
+    <div class="empty-state-card"><div class="empty-icon">&#128236;</div><h3>No messages yet</h3><p>When another campus member contacts you about an item, it will appear here.</p></div>
+  {% endif %}
+</div>
+{% endblock %}

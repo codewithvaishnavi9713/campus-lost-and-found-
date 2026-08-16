@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Home | Smart Campus Lost & Found{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      <span>Next-Gen Smart Campus Infrastructure</span>
+    </div>
+    
+    <h1 class="hero-title">
+      Lost Something on Campus? <br>
+      <span class="gradient-text">We'll Help You Find It.</span>
+    </h1>
+
+    <p class="hero-description">
+      A centralized, AI-powered lost and found platform for students, faculty, and campus staff. Report lost items or submit found belongings in seconds.
+    </p>
+
+    <div class="hero-actions">
+
+    <a
+        href="{{ url_for('items.report_lost') }}"
+        class="btn btn-primary report-btn"
+        onclick="window.location.href=this.href; return false;"
+    >
+        🔎 Report Lost Item
+    </a>
+
+    <a
+        href="{{ url_for('items.report_found') }}"
+        class="btn btn-secondary report-btn"
+        onclick="window.location.href=this.href; return false;"
+    >
+        📦 Report Found Item
+    </a>
+
+</div>
+</section>
+
+<!-- Feature Overview Section -->
+<section class="features-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-subtitle">Platform Highlights</div>
+      <h2 class="section-title">Designed for Modern Campus Life</h2>
+    </div>
+
+    <div class="grid-3">
+      <!-- Feature Card 1 -->
+      <div class="card">
+        <div class="card-icon">
+          ⚡
+        </div>
+        <h3 class="card-title">Instant Reporting</h3>
+        <p class="card-text">
+          Quickly log lost or found items with location tags, detailed descriptions, and image attachments.
+        </p>
+      </div>
+
+      <!-- Feature Card 2 -->
+      <div class="card">
+        <div class="card-icon pink">
+          🤖
+        </div>
+        <h3 class="card-title">AI Matching (Upcoming)</h3>
+        <p class="card-text">
+          Smart similarity scoring and visual matching algorithms automatically cross-reference lost reports against found inventory.
+        </p>
+      </div>
+
+      <!-- Feature Card 3 -->
+      <div class="card">
+        <div class="card-icon cyan">
+          🛡️
+        </div>
+        <h3 class="card-title">Verified Claiming</h3>
+        <p class="card-text">
+          Secure ownership verification and campus ID authentication ensure items are safely returned to their rightful owners.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

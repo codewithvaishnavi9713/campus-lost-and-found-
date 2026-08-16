@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {% if is_edit %}Edit Report{% else %}Report {{ item_type | capitalize }} Item{% endif %} | Smart Campus Lost & Found
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card form-card-wide">
+    <div class="auth-header">
+      <div class="auth-icon {% if item_type == 'found' %}cyan{% endif %}">
+        {% if item_type == 'lost' %}🔍{% else %}📦{% endif %}
+      </div>
+      <h1 class="auth-title">
+        {% if is_edit %}Edit Item Report{% else %}Report {{ item_type | capitalize }} Item{% endif %}
+      </h1>
+      <p class="auth-subtitle">
+        {% if item_type == 'lost' %}
+          Provide details about the item you lost on campus to help locate it.
+        {% else %}
+          Provide details about the item you found on campus to help return it.
+        {% endif %}
+      </p>
+    </div>
+
+    <form 
+      method="POST" 
+      action="{% if is_edit %}{{ url_for('items.edit_item', id=item.id) }}{% elif item_type == 'lost' %}{{ url_for('items.report_lost') }}{% else %}{{ url_for('items.report_found') }}{% endif %}" 
+      enctype="multipart/form-data" 
+      class="auth-form"
+    >
+      <div class="form-row grid-2">
+        <!-- Title -->
+        <div class="form-group">
+          <label for="title" class="form-label">Item Title <span class="required">*</span></label>
+          <input 
+            type="text" 
+            id="title" 
+            name="title" 
+            class="form-control" 
+            placeholder="e.g. Blue Hydro Flask Water Bottle" 
+            value="{% if is_edit %}{{ item.title }}{% elif form_data %}{{ form_data.title }}{% endif %}" 
+            required 
+            autofocus
+          >
+        </div>
+
+        <!-- Category -->
+        <div class="form-group">
+          <label for="category" class="form-label">Category <span class="required">*</span></label>
+          <select id="category" name="category" class="form-control" required>
+            <option value="" disabled {% if not is_edit and not form_data %}selected{% endif %}>Select Category</option>
+            {% for cat in categories %}
+              <option value="{{ cat }}" 
+                {% if is_edit and item.category == cat %}selected
+                {% elif form_data and form_data.category == cat %}selected{% endif %}
+              >
+                {{ cat }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label for="description" class="form-label">Detailed Description <span class="required">*</span></label>
+        <textarea 
+          id="description" 
+          name="description" 
+          class="form-control" 
+          rows="4" 
+          placeholder="Describe distinctive marks, stickers, serial numbers, brand, or condition..." 
+          required
+        >{% if is_edit %}{{ item.description }}{% elif form_data %}{{ form_data.description }}{% endif %}</textarea>
+      </div>
+
+      <div class="form-row grid-3-form">
+        <!-- Color -->
+        <div class="form-group">
+          <label for="color" class="form-label">Primary Color</label>
+          <input 
+            type="text" 
+            id="color" 
+            name="color" 
+            class="form-control" 
+            placeholder="e.g. Navy Blue / Silver" 
+            value="{% if is_edit %}{{ item.color or '' }}{% elif form_data %}{{ form_data.color }}{% endif %}"
+          >
+        </div>
+
+        <!-- Location -->
+        <div class="form-group">
+          <label for="location" class="form-label">Location <span class="required">*</span></label>
+          <input 
+            type="text" 
+            id="location" 
+            name="location" 
+            class="form-control" 
+            placeholder="e.g. Science Library, 2nd Floor" 
+            value="{% if is_edit %}{{ item.location }}{% elif form_data %}{{ form_data.location }}{% endif %}" 
+            required
+          >
+        </div>
+
+        <!-- Date -->
+        <div class="form-group">
+          <label for="date" class="form-label">Date <span class="required">*</span></label>
+          <input 
+            type="date" 
+            id="date" 
+            name="date" 
+            class="form-control" 
+            value="{% if is_edit %}{{ item.date.strftime('%Y-%m-%d') }}{% elif form_data %}{{ form_data.date }}{% endif %}" 
+            required
+          >
+        </div>
+      </div>
+
+      <!-- Image Upload -->
+      <div class="form-group">
+        <label for="image" class="form-label">Upload Item Photo (Optional)</label>
+        <input 
+          type="file" 
+          id="image" 
+          name="image" 
+          class="form-control file-input" 
+          accept="image/png, image/jpeg, image/webp, image/gif"
+        >
+        <span class="form-hint">Accepted formats: PNG, JPG, JPEG, WEBP, GIF (Max 5MB)</span>
+      </div>
+
+      {% if is_edit and item.image_filename %}
+        <div class="current-image-preview">
+          <span class="form-label">Current Photo:</span>
+          <img src="{{ url_for('static', filename='uploads/' + item.image_filename) }}" alt="Current photo" class="img-thumbnail">
+        </div>
+      {% endif %}
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-block">
+          <span>{% if is_edit %}Update Report{% else %}Submit {{ item_type | capitalize }} Item Report{% endif %}</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

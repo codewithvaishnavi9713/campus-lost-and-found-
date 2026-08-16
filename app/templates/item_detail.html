@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}{{ item.title }} | Smart Campus Lost & Found{% endblock %}
+
+{% block content %}
+<div class="container detail-wrapper">
+  <!-- Back Button Navigation -->
+  <div class="back-nav">
+    <a href="{% if item.item_type == 'lost' %}{{ url_for('items.lost_items') }}{% else %}{{ url_for('items.found_items') }}{% endif %}" class="back-link">
+      &larr; Back to {{ item.item_type | capitalize }} Items
+    </a>
+  </div>
+
+  <div class="detail-card">
+    <div class="grid-2-detail">
+      <!-- Media Showcase Column -->
+      <div class="detail-media">
+        {% if item.image_filename %}
+          <img src="{{ url_for('static', filename='uploads/' + item.image_filename) }}" alt="{{ item.title }}" class="detail-image">
+        {% else %}
+          <div class="detail-image-placeholder">
+            <span class="placeholder-icon">{% if item.item_type == 'lost' %}🔍{% else %}📦{% endif %}</span>
+            <span class="placeholder-text">No photo uploaded</span>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Detail Metadata Column -->
+      <div class="detail-info">
+        <div class="detail-header-tags">
+          <span class="badge-type {{ item.item_type }}">{{ item.item_type | upper }}</span>
+          <span class="status-badge {{ item.status }}">{{ item.status | upper }}</span>
+          <span class="category-pill">{{ item.category }}</span>
+        </div>
+
+        <h1 class="detail-title">{{ item.title }}</h1>
+
+        <!-- Spec Grid -->
+        <div class="specs-grid">
+          <div class="spec-item">
+            <span class="spec-label">📍 Location</span>
+            <span class="spec-value">{{ item.location }}</span>
+          </div>
+
+          <div class="spec-item">
+            <span class="spec-label">📅 Date Reported/Found</span>
+            <span class="spec-value">{{ item.date.strftime('%B %d, %Y') }}</span>
+          </div>
+
+          {% if item.color %}
+            <div class="spec-item">
+              <span class="spec-label">🎨 Primary Color</span>
+              <span class="spec-value">{{ item.color }}</span>
+            </div>
+          {% endif %}
+
+          <div class="spec-item">
+            <span class="spec-label">👤 Reported By</span>
+            <span class="spec-value">{{ item.reporter.name }}</span>
+          </div>
+
+          <div class="spec-item">
+            <span class="spec-label">⏰ Report Created</span>
+            <span class="spec-value">{{ item.created_at.strftime('%b %d, %Y at %H:%M UTC') }}</span>
+          </div>
+        </div>
+
+        <!-- Description Box -->
+        <div class="detail-description-box">
+          <h3 class="box-title">Item Description</h3>
+          <p class="box-text">{{ item.description }}</p>
+        </div>
+
+        {% if current_user.is_authenticated and item.status == 'active' %}
+          <a href="{{ url_for('matching.item_matches', id=item.id) }}" class="btn btn-primary match-button">
+            🤖 Find Possible Matches
+          </a>
+        {% endif %}
+
+        {% if current_user.is_authenticated and item.status == 'active' and current_user.id != item.user_id %}
+          <a href="{{ url_for('messages.compose', item_id=item.id) }}" class="btn btn-secondary match-button">
+            📩 Contact Reporter
+          </a>
+        {% endif %}
+
+        <!-- Owner Actions Panel -->
+        {% if current_user.is_authenticated and current_user.id == item.user_id %}
+          <div class="owner-actions-panel">
+            <h4 class="panel-title">⚙️ Owner Actions</h4>
+            <div class="action-buttons-group">
+              <!-- Edit -->
+              <a href="{{ url_for('items.edit_item', id=item.id) }}" class="btn btn-secondary btn-sm">
+                ✏️ Edit Report
+              </a>
+
+              <!-- Toggle Resolved -->
+              <form method="POST" action="{{ url_for('items.resolve_item', id=item.id) }}" class="inline-form">
+                <button type="submit" class="btn btn-secondary btn-sm">
+                  {% if item.status == 'active' %}
+                    ✅ Mark as Resolved
+                  {% else %}
+                    🔄 Reopen Report
+                  {% endif %}
+                </button>
+              </form>
+
+              <!-- Delete -->
+              <form method="POST" action="{{ url_for('items.delete_item', id=item.id) }}" class="inline-form" onsubmit="return confirm('Are you sure you want to delete this item report? This action cannot be undone.');">
+                <button type="submit" class="btn btn-danger btn-sm">
+                  🗑️ Delete Report
+                </button>
+              </form>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

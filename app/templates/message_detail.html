@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Message | Smart Campus Lost & Found{% endblock %}
+{% block content %}
+<div class="container detail-wrapper">
+  <div class="back-nav"><a class="back-link" href="{{ url_for('messages.inbox') }}">&larr; Back to Messages</a></div>
+  <section class="detail-card message-detail-card">
+    <div class="detail-header-tags"><span class="status-badge {% if message.is_read %}resolved{% else %}active{% endif %}">{% if message.is_read %}READ{% else %}UNREAD{% endif %}</span><span class="category-pill">Related item: {{ message.item.title }}</span></div>
+    <h1 class="detail-title">{{ message.subject }}</h1>
+    <div class="message-meta-grid"><div><span>From</span><strong>{{ message.sender.name }}</strong></div><div><span>Related item</span><a href="{{ url_for('items.item_detail', id=message.item.id) }}">{{ message.item.title }}</a></div><div><span>Sent</span><strong>{{ message.created_at.strftime('%b %d, %Y at %H:%M') }}</strong></div></div>
+    <div class="detail-description-box"><h3 class="box-title">Message</h3><p class="box-text">{{ message.body }}</p></div>
+    <form method="POST" action="{{ url_for('messages.reply', id=message.id) }}" class="reply-form"><h3 class="box-title">Reply</h3><div class="form-group"><label class="form-label" for="subject">Subject</label><input class="form-control" id="subject" name="subject" maxlength="150" value="Re: {{ message.subject }}" required></div><div class="form-group"><label class="form-label" for="body">Message</label><textarea class="form-control" id="body" name="body" rows="5" maxlength="2000" required></textarea></div><button class="btn btn-primary btn-sm" type="submit">Reply</button></form>
+    <form method="POST" action="{{ url_for('messages.delete', id=message.id) }}" class="delete-message-form"><button class="btn btn-danger btn-sm" type="submit">Delete</button></form>
+  </section>
+</div>
+{% endblock %}

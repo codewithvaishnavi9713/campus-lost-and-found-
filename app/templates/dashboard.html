@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}User Dashboard | Smart Campus Lost & Found{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper container">
+  <!-- Welcome Banner -->
+  <div class="dashboard-header">
+    <div class="user-greeting">
+      <div class="avatar-circle">
+        {{ user.name[0] | upper }}
+      </div>
+      <div>
+        <h1 class="dashboard-title">Welcome back, <span class="gradient-text">{{ user.name }}</span></h1>
+        <p class="dashboard-subtitle">Authenticated Campus Member • {{ user.email }}</p>
+      </div>
+    </div>
+    <div class="dashboard-badge">
+      <span class="dot"></span> Account Active
+    </div>
+  </div>
+
+  {% if alerts %}
+  <section class="user-items-section">
+    <h2 class="section-title margin-bottom">New Match Alerts ({{ alerts|length }})</h2>
+    {% for alert in alerts %}
+      <div class="alert alert-info"><span class="alert-message">{{ alert.message }}</span><form method="POST" action="{{ url_for('auth.read_alert', notification_id=alert.id) }}"><button class="btn btn-secondary btn-sm">Review match</button></form></div>
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  <!-- Dashboard Actions Quick Bar -->
+  <div class="dashboard-actions-bar">
+    <a href="{{ url_for('items.report_lost') }}" class="btn btn-primary">
+      <span>🔍 Report Lost Item</span>
+    </a>
+    <a href="{{ url_for('items.report_found') }}" class="btn btn-secondary">
+      <span>📦 Report Found Item</span>
+    </a>
+    <div class="message-summary-card">
+      <div><strong>📬 Messages</strong><span>Unread messages: {{ unread_message_count }}</span></div>
+      <a href="{{ url_for('messages.inbox') }}" class="btn btn-secondary btn-sm">View Messages</a>
+    </div>
+  </div>
+
+  <!-- User Items List Section -->
+  <div class="user-items-section">
+    <h2 class="section-title margin-bottom">My Reported Items ({{ user.items | length }})</h2>
+
+    {% if user.items %}
+      <div class="grid-3 items-grid">
+        {% for item in user.items %}
+          <div class="card item-card">
+            <div class="card-image-wrapper">
+              {% if item.image_filename %}
+                <img src="{{ url_for('static', filename='uploads/' + item.image_filename) }}" alt="{{ item.title }}" class="item-img">
+              {% else %}
+                <div class="item-img-placeholder">
+                  <span>{% if item.item_type == 'lost' %}🔍{% else %}📦{% endif %}</span>
+                </div>
+              {% endif %}
+              <span class="badge-type {{ item.item_type }}">{{ item.item_type | upper }}</span>
+              <span class="status-badge {{ item.status }} float-right">{{ item.status | upper }}</span>
+            </div>
+
+            <div class="card-content">
+              <div class="card-meta">
+                <span class="category-pill">{{ item.category }}</span>
+                <span class="date-pill">📅 {{ item.date.strftime('%b %d, %Y') }}</span>
+              </div>
+
+              <h3 class="item-title">{{ item.title }}</h3>
+              <p class="item-description-snippet">{{ item.description | truncate(90) }}</p>
+
+              <div class="card-footer-action">
+                <a href="{{ url_for('items.item_detail', id=item.id) }}" class="btn btn-secondary btn-sm btn-block">
+                  Manage Item &rarr;
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state-card">
+        <div class="empty-icon">📝</div>
+        <h3>You Haven't Reported Any Items Yet</h3>
+        <p>Report lost or found items across campus to keep your dashboard updated.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

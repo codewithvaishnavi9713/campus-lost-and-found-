@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Smart Campus Lost & Found{% endblock %}</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+<a href="{{ url_for('main.index') }}" class="brand">
+    <img
+        src="{{ url_for('static', filename='images/campuslostfound.png') }}"
+        alt="Campus Lost & Found"
+        class="brand-logo"
+    >
+    <span class="brand-text">
+        Campus<span>Lost&Found</span>
+    </span>
+</a>
+  <!-- Navbar Header -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="{{ url_for('main.index') }}" class="brand-logo">
+        <div class="logo-icon">🔍</div>
+        <span>Campus<span class="gradient-text">Lost&Found</span></span>
+      </a>
+
+      <ul class="nav-menu">
+        <li><a href="{{ url_for('main.index') }}" class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}">Home</a></li>
+        <li><a href="{{ url_for('items.lost_items') }}" class="nav-link {% if request.endpoint == 'items.lost_items' %}active{% endif %}">Lost Items</a></li>
+        <li><a href="{{ url_for('items.found_items') }}" class="nav-link {% if request.endpoint == 'items.found_items' %}active{% endif %}">Found Items</a></li>
+        {% if current_user.is_authenticated %}
+          <li><a href="{{ url_for('items.report_lost') }}" class="nav-link {% if request.endpoint == 'items.report_lost' %}active{% endif %}">Report Lost</a></li>
+          <li><a href="{{ url_for('items.report_found') }}" class="nav-link {% if request.endpoint == 'items.report_found' %}active{% endif %}">Report Found</a></li>
+          <li><a href="{{ url_for('auth.dashboard') }}" class="nav-link {% if request.endpoint == 'auth.dashboard' %}active{% endif %}">Dashboard</a></li>
+          <li><a href="{{ url_for('messages.inbox') }}" class="nav-link {% if request.endpoint and request.endpoint.startswith('messages.') %}active{% endif %}">Messages{% if unread_message_count %} ({{ unread_message_count }}){% endif %}</a></li>
+          {% if current_user.email.lower() in config.CAMPUS_ADMIN_EMAILS %}<li><a href="{{ url_for('admin.moderation') }}" class="nav-link">Moderation</a></li>{% endif %}
+        {% endif %}
+      </ul>
+
+      <div class="nav-actions">
+        {% if current_user.is_authenticated %}
+          <span class="user-pill">👤 {{ current_user.name }}</span>
+          <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary btn-sm">Logout</a>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}" class="nav-link">Sign In</a>
+          <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm">Register</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <!-- Flash Messages Banner Container -->
+  <div class="container flash-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            <span class="alert-icon">
+              {% if category == 'success' %}✅
+              {% elif category == 'danger' %}⚠️
+              {% elif category == 'warning' %}🔔
+              {% else %}ℹ️{% endif %}
+            </span>
+            <span class="alert-message">{{ message }}</span>
+            <button class="alert-close" onclick="this.parentElement.remove();">&times;</button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Main Content Block -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <p>&copy; 2026 Smart Campus Lost & Found. Built with Flask, SQLite & Jinja2.</p>
+      <p><small style="color: var(--text-muted);">Phase 2 Architecture - Item Reporting & Listing Enabled</small></p>
+    </div>
+  </footer>
+
+  <!-- Main Script -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

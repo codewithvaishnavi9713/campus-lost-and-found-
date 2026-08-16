@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | Smart Campus Lost & Found{% endblock %}
+
+{% block content %}
+<div class="container page-wrapper">
+  <!-- Header Banner -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">
+        {% if item_type == 'lost' %}🔍 Lost Items Catalog{% else %}📦 Found Items Registry{% endif %}
+      </h1>
+      <p class="page-subtitle">
+        {% if item_type == 'lost' %}
+          Browse items currently reported lost across campus buildings and grounds.
+        {% else %}
+          Browse items currently turned in or found by campus members.
+        {% endif %}
+      </p>
+    </div>
+
+    {% if current_user.is_authenticated %}
+      <a href="{% if item_type == 'lost' %}{{ url_for('items.report_lost') }}{% else %}{{ url_for('items.report_found') }}{% endif %}" class="btn btn-primary">
+        <span>+ Report {{ item_type | capitalize }} Item</span>
+      </a>
+    {% endif %}
+  </div>
+
+  <form method="GET" class="filter-bar" aria-label="Search item reports">
+    <input name="q" value="{{ filters.q }}" placeholder="Search title, description, or place">
+    <select name="category"><option value="">All categories</option>{% for category in categories %}<option value="{{ category }}" {% if filters.category == category %}selected{% endif %}>{{ category }}</option>{% endfor %}</select>
+    <input name="location" value="{{ filters.location }}" placeholder="Location">
+    <input name="color" value="{{ filters.color }}" placeholder="Colour">
+    <button class="btn btn-primary btn-sm" type="submit">Search</button>
+    {% if filters.q or filters.category or filters.location or filters.color %}<a class="btn btn-secondary btn-sm" href="{{ url_for(request.endpoint) }}">Clear</a>{% endif %}
+  </form>
+  <p class="filter-result-count">{{ items|length }} active {{ item_type }} report{{ '' if items|length == 1 else 's' }} found.</p>
+
+  <!-- Items Grid -->
+  {% if items %}
+    <div class="grid-3 items-grid">
+      {% for item in items %}
+        <div class="card item-card">
+          <!-- Card Image Thumbnail -->
+          <div class="card-image-wrapper">
+            {% if item.image_filename %}
+              <img src="{{ url_for('static', filename='uploads/' + item.image_filename) }}" alt="{{ item.title }}" class="item-img">
+            {% else %}
+              <div class="item-img-placeholder">
+                <span>{% if item.item_type == 'lost' %}🔍{% else %}📦{% endif %}</span>
+              </div>
+            {% endif %}
+            <span class="badge-type {{ item.item_type }}">{{ item.item_type | upper }}</span>
+          </div>
+
+          <!-- Card Content -->
+          <div class="card-content">
+            <div class="card-meta">
+              <span class="category-pill">{{ item.category }}</span>
+              <span class="date-pill">📅 {{ item.date.strftime('%b %d, %Y') }}</span>
+            </div>
+
+            <h3 class="item-title">{{ item.title }}</h3>
+            <p class="item-description-snippet">{{ item.description | truncate(110) }}</p>
+
+            <div class="item-details-row">
+              <span>📍 {{ item.location }}</span>
+              {% if item.color %}
+                <span>🎨 {{ item.color }}</span>
+              {% endif %}
+            </div>
+
+            <div class="card-footer-action">
+              <a href="{{ url_for('items.item_detail', id=item.id) }}" class="btn btn-secondary btn-sm btn-block">
+                View Details &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <!-- Empty State UI -->
+    <div class="empty-state-card">
+      <div class="empty-icon">📂</div>
+      <h3>No {{ item_type | capitalize }} Items Reported Yet</h3>
+      <p>There are currently no active {{ item_type }} item reports listed in the database.</p>
+      {% if current_user.is_authenticated %}
+        <a href="{% if item_type == 'lost' %}{{ url_for('items.report_lost') }}{% else %}{{ url_for('items.report_found') }}{% endif %}" class="btn btn-primary">
+          <span>Be the First to Report</span>
+        </a>
+      {% else %}
+        <a href="{{ url_for('auth.login') }}" class="btn btn-secondary">
+          <span>Log In to Submit a Report</span>
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

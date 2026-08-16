@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}AI Possible Matches | Smart Campus Lost & Found{% endblock %}
+
+{% block content %}
+<div class="container page-wrapper">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">🤖 AI Possible Matches</h1>
+      <p class="page-subtitle">Ranked possible matches for <strong>{{ item.title }}</strong>. Similarity assists review; it does not verify ownership.</p>
+    </div>
+    <a href="{{ url_for('items.item_detail', id=item.id) }}" class="btn btn-secondary btn-sm">← Back to Item</a>
+  </div>
+
+  {% if results %}
+    <div class="matches-grid">
+      {% for result in results %}
+        {% set matched = result.item %}
+        <article class="card match-card">
+          <div class="card-image-wrapper">
+            {% if matched.image_filename %}
+              <img src="{{ url_for('static', filename='uploads/' + matched.image_filename) }}" alt="{{ matched.title }}" class="item-img">
+            {% else %}
+              <div class="item-img-placeholder"><span>{% if matched.item_type == 'lost' %}🔍{% else %}📦{% endif %}</span></div>
+            {% endif %}
+            <span class="badge-type {{ matched.item_type }}">{{ matched.item_type | upper }}</span>
+            <span class="match-score">{{ result.score | round(0) | int }}% Match</span>
+          </div>
+          <div class="card-content">
+            <div class="match-label {% if result.score >= 80 %}very-strong{% elif result.score >= 60 %}good{% else %}possible{% endif %}">
+              {% if result.score >= 80 %}Very Strong Match{% elif result.score >= 60 %}Good Match{% else %}Possible Match{% endif %}
+            </div>
+            <h2 class="item-title">{{ matched.title }}</h2>
+            <p class="item-details-row">{{ matched.category }} · {{ matched.color or 'Color not provided' }}<br>📍 {{ matched.location }} · 📅 {{ matched.date.strftime('%b %d, %Y') }}</p>
+            <div class="score-breakdown">
+              <div><span>Category</span><strong>{{ result.scores.category | round(0) | int }}/20</strong></div>
+              <div><span>Color</span><strong>{{ result.scores.color | round(0) | int }}/10</strong></div>
+              <div><span>Location</span><strong>{{ result.scores.location | round(0) | int }}/15</strong></div>
+              <div><span>Date</span><strong>{{ result.scores.date | round(0) | int }}/10</strong></div>
+              <div><span>Description</span><strong>{{ result.scores.text | round(0) | int }}/45</strong></div>
+            </div>
+            <p class="match-explanation">{{ result.explanation }}</p>
+            <p class="item-details-row"><strong>Visual similarity:</strong> {% if result.visual_score is not none %}{{ result.visual_score }}{% else %}Not enabled — this deployment has no vision model configured.{% endif %}</p>
+            <a href="{{ url_for('items.item_detail', id=matched.id) }}" class="btn btn-secondary btn-sm btn-block">Review Item Details →</a>
+            {% if current_user.id != matched.user_id and matched.status == 'active' %}
+              <a href="{{ url_for('messages.compose', item_id=matched.id) }}" class="btn btn-primary btn-sm btn-block match-contact-button">📩 Contact Reporter</a>
+            {% endif %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state-card">
+      <div class="empty-icon">🤖</div>
+      <h3>No Possible Matches Yet</h3>
+      <p>No active opposite-type reports reached the 40% similarity threshold. You can check again as new reports are added.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
