@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🎓 Smart Campus Lost & Found
 
 A modern, AI-ready lost and found web application designed specifically for university and college campuses.
@@ -79,3 +80,7 @@ smart-campus-lost-found/
 - **Phase 2:** Lost & Found Item Reporting Forms with Image Uploads
 - **Phase 3:** Smart AI Item Matching Engine & Similarity Scoring
 - **Phase 4:** Interactive Dashboard, Claiming Workflow & Notifications
+=======
+# campus-lost-and-found-
+campus lost and found is a web page that helps the students to found their lost items from the campus.
+>>>>>>> cc0f467608a9c2780ff42d86602a7c84a779a31f
